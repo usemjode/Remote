@@ -3,255 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentation Remote</title>
+    <title>Dashboard Remote Control</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
-            --error-color: #ff6b6b;
-            --success-color: #2ecc71;
-            --input-bg: #2a2a2a;
+            --bg-color: #0b0f19;
+            --card-bg: #131a26;
+            --accent-blue: #3b82f6;
+            --text-main: #ffffff;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #1e293b;
         }
 
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 16px;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
         }
 
-        .card {
+        .container {
             width: 100%;
-            max-width: 360px;
-            text-align: center;
+            max-width: 420px;
             background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
             box-sizing: border-box;
         }
 
-        .title {
-            font-size: 28px;
+        /* Network Status Header Layout */
+        .dashboard-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .network-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
-        .status {
-            font-size: 14px;
-            color: #888888;
-            margin-bottom: 30px;
-            min-height: 20px;
+        .network-badge.offline {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
         }
 
-        /* PIN Guess Layout */
-        .pin-display {
-            background-color: var(--input-bg);
-            font-size: 32px;
-            letter-spacing: 10px;
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background-color: currentColor;
+            border-radius: 50%;
+            animation: pulse-animation 1.8s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+
+        .conn-details {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .highlight {
+            color: var(--text-main);
+            font-weight: 600;
+            font-family: monospace;
+            background-color: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Status & Terminal Logs box */
+        .log-box {
+            background-color: #070a10;
+            border: 1px solid var(--border);
+            border-radius: 10px;
             padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-            font-weight: bold;
-            min-height: 45px;
+            font-family: monospace;
+            font-size: 13px;
+            color: var(--accent-blue);
+            text-align: left;
+            margin-bottom: 24px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
         }
 
-        .pin-grid {
+        /* Grid Controls */
+        .controls-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
         .btn {
-            background-color: #2d2d2d;
-            color: var(--text-color);
-            border: none;
-            padding: 18px;
-            font-size: 20px;
+            background-color: var(--border);
+            color: var(--text-main);
+            border: 1px solid transparent;
+            padding: 20px;
+            font-size: 16px;
             font-weight: 600;
-            border-radius: 50%;
+            border-radius: 12px;
             cursor: pointer;
-            aspect-ratio: 1;
-            transition: background 0.1s;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn:active {
-            background-color: #404040;
+            transform: scale(0.97);
+            background-color: #243247;
         }
 
-        .btn-action {
-            border-radius: 8px;
-            aspect-ratio: auto;
-            font-size: 16px;
-            background-color: #3a3a3a;
-        }
-
-        /* Remote Control Interface */
-        .grid-remote {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .span-2 { grid-column: span 2; }
-
-        .btn-remote {
-            background-color: var(--text-color);
-            color: var(--bg-color);
-            border-radius: 12px;
-            padding: 25px;
+        .btn-primary {
+            background-color: var(--accent-blue);
+            grid-column: span 2;
+            padding: 24px;
             font-size: 18px;
-            aspect-ratio: auto;
+        }
+
+        .btn-primary:active {
+            background-color: #2563eb;
         }
 
         .btn-danger {
-            background-color: transparent;
-            color: var(--error-color);
-            border: 2px solid var(--error-color);
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
-        .hidden { display: none !important; }
+        .btn-danger:active {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
     </style>
 </head>
 <body>
 
-    <div id="guess-screen" class="card">
-        <div class="title">Enter Remote Code</div>
-        <div id="sync-status" class="status">Connecting to sync server...</div>
-        
-        <div id="pin-view" class="pin-display"></div>
-        
-        <div class="pin-grid">
-            <button class="btn" onclick="pressKey('1')">1</button>
-            <button class="btn" onclick="pressKey('2')">2</button>
-            <button class="btn" onclick="pressKey('3')">3</button>
-            <button class="btn" onclick="pressKey('4')">4</button>
-            <button class="btn" onclick="pressKey('5')">5</button>
-            <button class="btn" onclick="pressKey('6')">6</button>
-            <button class="btn" onclick="pressKey('7')">7</button>
-            <button class="btn" onclick="pressKey('8')">8</button>
-            <button class="btn" onclick="pressKey('9')">9</button>
-            <button class="btn btn-action" onclick="clearPin()">Clear</button>
-            <button class="btn" onclick="pressKey('0')">0</button>
-            <button class="btn btn-action" style="background-color: var(--success-color); color: #121212;" onclick="checkGuess()">Go</button>
+    <div class="container">
+        <div class="dashboard-header">
+            <div id="status-badge" class="network-badge offline">
+                <div class="pulse"></div>
+                <span id="badge-text">DISCONNECTED</span>
+            </div>
+            
+            <div class="conn-details">
+                Target Server: <span id="info-ip" class="highlight">Offline</span><br>
+                Active Session Port: <span id="info-port" class="highlight">None</span>
+            </div>
         </div>
-    </div>
 
-    <div id="remote-screen" class="card hidden">
-        <div class="title" style="font-size: 24px;">Remote Active</div>
-        <div id="remote-status" class="status" style="color: var(--success-color);">Connected</div>
-        
-        <div class="grid-remote">
-            <button class="btn btn-remote span-2" onclick="sendRemoteCommand('next')">NEXT SLIDE</button>
-            <button class="btn btn-remote" onclick="sendRemoteCommand('previous')">PREVIOUS</button>
-            <button class="btn btn-remote btn-danger" onclick="sendRemoteCommand('blackout')">Blackout</button>
+        <div id="log-box" class="log-box">
+            [SYS]: Awaiting synchronization link from Discord...
+        </div>
+
+        <div class="controls-grid">
+            <button class="btn btn-primary" onclick="sendCommand('next')">NEXT SLIDE</button>
+            <button class="btn" onclick="sendCommand('previous')">PREVIOUS</button>
+            <button class="btn btn-danger" onclick="sendCommand('blackout')">BLACKOUT</button>
         </div>
     </div>
 
     <script>
         // ================= CONFIGURATION =================
-        const COMPUTER_IP = "http://192.168.1.100"; // Computer's local IP
+        const COMPUTER_IP = "192.168.1.100"; // Put your computer's local network IP here
         const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1515395624143425677/fMSyb5HE-fQcbRhZdtEGxo2Tz9md5jtm684dkRq7x_56jgfirKK4_w3oWPD4IUj7Y8_l";
         // =================================================
 
-        let correctPortCode = ""; 
-        let currentGuess = "";
-        let targetTargetUrl = "";
+        let activePort = "";
+        let commandUrl = "";
 
-        // Background sync: Fetch the target port name from Discord silently
-        async function loadPortFromDiscord() {
-            const syncStatus = document.getElementById('sync-status');
+        async function listenToWebhook() {
+            const badge = document.getElementById('status-badge');
+            const badgeText = document.getElementById('badge-text');
+            const infoIp = document.getElementById('info-ip');
+            const infoPort = document.getElementById('info-port');
+            const logBox = document.getElementById('log-box');
+
             try {
+                // Fetch the webhook data directly
                 const response = await fetch(DISCORD_WEBHOOK_URL);
-                if (!response.ok) throw new Error();
+                if (!response.ok) throw new Error("Unreachable");
 
-                const webhookData = await response.json();
+                const data = await response.json();
                 
-                // Clean up the webhook name to extract just the numbers
-                const cleanName = webhookData.name.trim();
-                const portMatch = cleanName.match(/\d{4}/);
+                // Read the current name of the webhook
+                const currentName = data.name.trim();
+                
+                // Look for a 4-digit port number anywhere in the webhook name
+                const portMatch = currentName.match(/\d{4}/);
 
                 if (portMatch) {
-                    correctPortCode = portMatch[0]; // Set the secret correct answer
-                    syncStatus.innerText = "System ready. Enter the 4-digit code.";
-                    syncStatus.style.color = "#888888";
+                    activePort = portMatch[0];
+                    commandUrl = `http://${COMPUTER_IP}:${activePort}/api/remote`;
+
+                    // Update UI Elements to reflect connection status
+                    badge.className = "network-badge";
+                    badgeText.innerText = "ONLINE";
+                    infoIp.innerText = COMPUTER_IP;
+                    infoPort.innerText = activePort;
+                    logBox.innerText = `[SYS]: Connected. Port structure [${activePort}] is linked and listening.`;
+                    logBox.style.color = "var(--success)";
                 } else {
-                    syncStatus.innerText = "App offline. Webhook name isn't a 4-digit code.";
-                    syncStatus.style.color = "var(--error-color)";
+                    logBox.innerText = `[SYS]: Webhook read successful, but name "${currentName}" contains no active port code.`;
                 }
+
             } catch (err) {
-                syncStatus.innerText = "Connection error. Check Webhook link.";
-                syncStatus.style.color = "var(--error-color)";
+                badge.className = "network-badge offline";
+                badgeText.innerText = "ERROR";
+                logBox.innerText = "[ERR]: Cross-origin sync check failed. Verify configuration.";
+                logBox.style.color = "var(--danger)";
             }
         }
 
-        // Keypad input handlers
-        function pressKey(num) {
-            if (currentGuess.length < 4) {
-                currentGuess += num;
-                document.getElementById('pin-view').innerText = currentGuess;
-            }
-        }
-
-        function clearPin() {
-            currentGuess = "";
-            document.getElementById('pin-view').innerText = "";
-        }
-
-        // Evaluate the guess against the hidden Discord name
-        function checkGuess() {
-            const syncStatus = document.getElementById('sync-status');
-            
-            if (!correctPortCode) {
-                syncStatus.innerText = "Cannot verify. System is currently offline.";
+        function sendCommand(action) {
+            const logBox = document.getElementById('log-box');
+            if (!activePort) {
+                logBox.innerText = "[ERR]: Command dropped. No active port connection established.";
+                logBox.style.color = "var(--danger)";
                 return;
             }
 
-            if (currentGuess === correctPortCode) {
-                // MATCH! Unlock remote
-                targetTargetUrl = `${COMPUTER_IP}:${correctPortCode}/api/remote`;
-                
-                document.getElementById('guess-screen').classList.add('hidden');
-                document.getElementById('remote-screen').classList.remove('hidden');
-                document.getElementById('remote-status').innerText = `Synced to Port ${correctPortCode}`;
-            } else {
-                // WRONG GUESS
-                syncStatus.innerText = "Incorrect code. Try again!";
-                syncStatus.style.color = "var(--error-color)";
-                clearPin();
-            }
-        }
+            logBox.innerText = `[TX]: Dispatching payload event: "${action.toUpperCase()}"...`;
+            logBox.style.color = "var(--accent-blue)";
 
-        // Send API commands to local computer execution port
-        function sendRemoteCommand(action) {
-            const rStatus = document.getElementById('remote-status');
-            fetch(targetTargetUrl, {
+            fetch(commandUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ command: action })
             })
             .then(res => {
                 if (res.ok) {
-                    rStatus.innerText = `Sent: ${action.toUpperCase()}`;
-                    rStatus.style.color = "var(--text-color)";
-                    setTimeout(() => { rStatus.innerText = "Connected"; rStatus.style.color = "var(--success-color)"; }, 1000);
+                    logBox.innerText = `[SUCCESS]: Command "${action.toUpperCase()}" executed by local server.`;
+                    logBox.style.color = "var(--success)";
                 }
             })
             .catch(() => {
-                rStatus.innerText = "App unreachable on local network";
-                rStatus.style.color = "var(--error-color)";
+                logBox.innerText = `[ERR]: Local port connection broken. Computer offline on network?`;
+                logBox.style.color = "var(--danger)";
             });
         }
 
-        window.onload = loadPortFromDiscord;
+        // Run the checker instantly on page load, and check for port updates automatically every 3 seconds
+        window.onload = () => {
+            listenToWebhook();
+            setInterval(listenToWebhook, 3000);
+        };
     </script>
 </body>
 </html>
